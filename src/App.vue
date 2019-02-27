@@ -100,12 +100,14 @@ export default {
   },
 
   methods: {
+    // reinitialise program position
     newRover() {
       this.roverDirections = "";
       this.setup = true;
       this.gridSize = false;
       this.controllers = false;
     },
+    // splice direction input and call relelvant functions
     directRover() {
       var commands = this.roverDirections.split("");
       let vm = this;
@@ -125,6 +127,7 @@ export default {
         }
       }
     },
+    //set index for ratation / degrees
     setIndex(i) {
       this.index = i;
     },
@@ -136,6 +139,7 @@ export default {
       this.warning = false;
       this.controllers = true;
     },
+    // depending on the index / degree the rover will move and change its grid position
     moveRover() {
       if (this.index == 0) {
         this.ml = parseInt(this.ml) + 4;
@@ -164,21 +168,10 @@ export default {
       } else {
         this.index = 3;
       }
-    },
-    rotateUp() {
-      this.right = false;
-      this.left = false;
-      this.up = true;
-      this.down = false;
-    },
-    rotateDown() {
-      this.right = false;
-      this.left = false;
-      this.up = false;
-      this.down = true;
     }
   },
   watch: {
+    // ensure that the x-axis of the grid are not compromised
     x() {
       if (parseInt(this.x) > parseInt(this.xMax)) {
         if (this.setup == true) {
@@ -199,6 +192,7 @@ export default {
         this.x = parseInt(this.x) + 1;
       }
     },
+    // ensure that the y-axis of the grid are not compromised
     y() {
       if (parseInt(this.y) > parseInt(this.yMax)) {
         if (this.setup == true) {
@@ -221,6 +215,7 @@ export default {
     }
   },
   computed: {
+    // keep track of the direction
     trueDirection() {
       if (this.index == 0) {
         return "East";
@@ -238,6 +233,7 @@ export default {
     width() {
       return this.ml + "%";
     },
+    // direction and direction2 form a string used for css class to rotate the rover
     direction() {
       if (this.left == true) {
         return "rotate-left";
