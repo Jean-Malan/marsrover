@@ -14,23 +14,23 @@
               <div class="setupwarning">{{setupWarning}}</div>
             </div>
 
-            <div v-if="gridSize">
-              <h1>Grid Size</h1>
+            <div v-if="setupGrid">
+              <h1 style="color:gray;text-align:center">Grid Size</h1>
               <p>Max X-axis:</p>
               <input v-model="xMax" />
               <br>
               <p>Max Y-axis:</p>
               <input v-model="yMax" />
               <br>
-              <button class="button-submit" @click="gridSize = false" style="margin-top:10%">Next</button>
+              <button class="button-submit" @click="RoverSetupOne" style="margin-top:10%">Next</button>
             </div>
 
-            <div v-if="gridSize == false">
-              <p class="back" style="color:gray;margin-left: -90%;font-size: 15px;" @click="gridSize=true">⬅ Back</p>
-              <p>Enter X-Axis Position:</p>
+            <div v-if="setupRoverOne">
+              <p class="back" style="color:gray;margin-left: -90%;font-size: 15px;" @click="showGridSetup">⬅ Back</p>
+              <p>Rover 1 X-Axis Position:</p>
               <input v-model="x" />
               <br>
-              <p>Enter Y-Axis Position:</p>
+              <p>Rover 1 Y-Axis Position:</p>
               <input v-model="y" />
               <br>
               <select placeholder="Select Direction" class="form-control" v-model="key">
@@ -38,16 +38,45 @@
                 <option class="custom-select" v-for="option in list_directions" :key="option.name" @click="setIndex(option.index)">{{option.name}}</option>
                 <br>
               </select>
+              <p>Rover 1 Directions :</p>
+              <input v-model="roverDirections" />
+              <br>
+              <button class="button-submit" @click="RoverSetupTwo" style="margin-top:10%">Next</button>
+            </div>
+
+            <div v-if="setupRoverTwo">
+              <p class="back" style="color:gray;margin-left: -90%;font-size: 15px;" @click="RoverSetupOne">⬅ Back</p>
+              <p>Rover 2 X-Axis Position:</p>
+              <input v-model="x2" />
+              <br>
+              <p>Rover 2 Y-Axis Position:</p>
+              <input v-model="y2" />
+              <br>
+              <select placeholder="Select Direction" class="form-control" v-model="key">
+                <option value="" disabled selected>Select Direction</option>
+                <option class="custom-select" v-for="option in list_directions" :key="option.name" @click="setIndex2(option.index)">{{option.name}}</option>
+                <br>
+              </select>
+               <p>Rover 2 Directions :</p>
+              <input v-model="roverDirections2" />
+              <br>
               <button class="button-submit" @click="completeSetup" style="margin-top:10%;width:150px;">Submit</button>
             </div>
+
           </div>
 
-          <h1 style="font-family:impact" v-if="controllers">X:{{x}} : Y:{{y}} {{trueDirection}}</h1>
+          <h1 style="font-family:impact;color:#ce4444" v-if="controllers">
+            Rover 1: X:{{x}} : Y:{{y}} {{trueDirection}}
+          </h1>
+          <h1 style="font-family:impact;color:#39b1c6" v-if="controllers">
+            Rover 2: X:{{x2}} : {{y2}} {{trueDirection2}}
+          </h1>
 
           <div v-if="controllers == true" style="padding-left:5%" class='controllers'>
-            <input v-model="roverDirections" placeholder="Enter Rover Directions" style="width:500px;height:50px;position: relative;" />
-            <button @click="directRover" style="width:15%;margin-left:2%;position: relative;" class="btn button-X">Submit</button>
-            <button @click="newRover" style="width:15%;margin-left:2%;position: relative;" class="btn button-B">New Rover</button>
+            <!-- <input v-model="roverDirections" placeholder="Enter Rover 1 Directions" style="width:500px;height:50px;position: relative;" />
+            <input v-model="roverDirections2" placeholder="Enter Rover 2 Directions" style="width:500px;height:50px;position: relative;" /> -->
+            <!-- <button @click="directRover" style="width:15%;margin-left:2%;position: relative;" class="btn button-X">Submit</button> -->
+            <button @click="newRover" style="width:15%;margin-left:2%;position: relative;" class="btn button-B">Edit Rovers</button>
           </div>
 
           <i v-if="controllers" :style="{'margin-top': height,
@@ -55,7 +84,14 @@
             '-moz-transform': direction2,
             '-webkit-transform': direction2,
             'transform': direction2,
-            'margin-left': width}" class="fas fa-space-shuttle" :class="direction" />
+            'margin-left': width}" style='color:#ce4444' class="fas fa-space-shuttle" :class="direction" />
+        </div>
+         <i v-if="controllers" :style="{'margin-top': height2,
+            '-ms-transform': directionRover2,
+            '-moz-transform': directionRover2,
+            '-webkit-transform': directionRover2,
+            'transform': directionRover2,
+            'margin-left': width2}" style='color:#39b1c6' class="fas fa-space-shuttle" :class="directionRover" />
         </div>
       </div>
     </div>
@@ -69,7 +105,11 @@ export default {
   data() {
     return {
       submitButton: false,
+      setupRoverOne: false,
+      setupRoverTwo: false,
+      setupGrid: true,
       roverDirections: "", // get string input for directions
+      roverDirections2: "", // get string input for directions
       setup: true,
       warning: false,
       warningMessage: false,
@@ -84,13 +124,18 @@ export default {
       ],
       x: null,
       y: null,
+      x2: null,
+      y2: null,
       xMax: null,
       yMax: null,
       move: 0,
       mt: 15,
+      mt2: 15,
       degrees: [0, 90, 180, 270],
       index: 0,
+      index2: 0,
       ml: 45,
+      ml2: 45,
       right: true,
       left: false,
       up: false,
@@ -100,6 +145,21 @@ export default {
   },
 
   methods: {
+    showGridSetup() {
+      this.setupGrid = true;
+      this.setupRoverOne = false;
+      this.setupRoverTwo = false;
+    },
+    RoverSetupOne() {
+      this.setupGrid = false;
+      this.setupRoverOne = true;
+      this.setupRoverTwo = false;
+    },
+    RoverSetupTwo() {
+      this.setupGrid = false;
+      this.setupRoverOne = false;
+      this.setupRoverTwo = true;
+    },
     // reinitialise program position
     newRover() {
       this.roverDirections = "";
@@ -113,29 +173,59 @@ export default {
     directRover() {
       var commands = this.roverDirections.split("");
       let vm = this;
-      for (let i = 0; i < commands.length; i++) {
-        if (commands[i].toLowerCase() == "l") {
-          setTimeout(() => {
-            vm.rotateLeft();
-          }, 1000);
-        } else if (commands[i].toLowerCase() == "r") {
-          setTimeout(() => {
-            vm.rotateRight();
-          }, 1000);
-        } else if (commands[i].toLowerCase() == "m") {
-          setTimeout(() => {
-            vm.moveRover();
-          }, 1000);
+      setTimeout(() => {
+        for (let i = 0; i < commands.length; i++) {
+          if (commands[i].toLowerCase() == "l") {
+            setTimeout(() => {
+              vm.rotateLeft();
+            }, 1000);
+          } else if (commands[i].toLowerCase() == "r") {
+            setTimeout(() => {
+              vm.rotateRight();
+            }, 1000);
+          } else if (commands[i].toLowerCase() == "m") {
+            setTimeout(() => {
+              vm.moveRover();
+            }, 1000);
+          }
         }
-      }
+      }, 2000);
+      setTimeout(() => {
+        this.directRover2();
+      }, 2000);
+    },
+    directRover2() {
+      var commands2 = this.roverDirections2.split("");
+      let vm = this;
+      setTimeout(() => {
+        for (let i = 0; i < commands2.length; i++) {
+          if (commands2[i].toLowerCase() == "l") {
+            setTimeout(() => {
+              vm.rotateLeft2();
+            }, 1000);
+          } else if (commands2[i].toLowerCase() == "r") {
+            setTimeout(() => {
+              vm.rotateRight2();
+            }, 1000);
+          } else if (commands2[i].toLowerCase() == "m") {
+            setTimeout(() => {
+              vm.moveRover2();
+            }, 1000);
+          }
+        }
+      }, 2000);
     },
     //set index for ratation / degrees
     setIndex(i) {
       this.index = i;
     },
+    setIndex2(i) {
+      this.index2 = i;
+    },
     completeSetup() {
       this.controllers = true;
       this.setup = false;
+      this.directRover();
     },
     closeWarning() {
       this.warning = false;
@@ -144,16 +234,16 @@ export default {
     // depending on the index / degree the rover will move and change its grid position
     moveRover() {
       if (this.index == 0) {
-        this.ml = parseInt(this.ml) + 4;
+        this.ml = parseInt(this.ml) + 7;
         this.x = parseInt(this.x) + 1;
       } else if (this.index == 1) {
-        this.mt = parseInt(this.mt) + 4;
+        this.mt = parseInt(this.mt) + 7;
         this.y = parseInt(this.y) - 1;
       } else if (this.index == 2) {
-        this.ml = parseInt(this.ml) - 4;
+        this.ml = parseInt(this.ml) - 7;
         this.x = parseInt(this.x) - 1;
       } else if (this.index == 3) {
-        this.mt = parseInt(this.mt) - 4;
+        this.mt = parseInt(this.mt) - 7;
         this.y = parseInt(this.y) + 1;
       }
     },
@@ -169,6 +259,35 @@ export default {
         this.index -= 1;
       } else {
         this.index = 3;
+      }
+    },
+    moveRover2() {
+      if (this.index2 == 0) {
+        this.ml2 = parseInt(this.ml2) + 7;
+        this.x2 = parseInt(this.x2) + 1;
+      } else if (this.index2 == 1) {
+        this.mt2 = parseInt(this.mt2) + 7;
+        this.y2 = parseInt(this.y2) - 1;
+      } else if (this.index2 == 2) {
+        this.ml2 = parseInt(this.ml2) - 7;
+        this.x2 = parseInt(this.x2) - 1;
+      } else if (this.index2 == 3) {
+        this.mt2 = parseInt(this.mt2) - 7;
+        this.y2 = parseInt(this.y2) + 1;
+      }
+    },
+    rotateRight2() {
+      if (this.index2 != 3) {
+        this.index2 += 1;
+      } else {
+        this.index2 = 0;
+      }
+    },
+    rotateLeft2() {
+      if (this.index2 != 0) {
+        this.index2 -= 1;
+      } else {
+        this.index2 = 3;
       }
     }
   },
@@ -216,6 +335,47 @@ export default {
       }
     }
   },
+  x2() {
+    if (parseInt(this.x2) > parseInt(this.xMax)) {
+      if (this.setup == true) {
+        this.setupWarning = "Must be smaller than the grid size";
+        this.warningMessage = true;
+      } else {
+        this.controllers = false;
+        this.warning = true;
+        this.x2 = parseInt(this.x2) - 1;
+      }
+    }
+    if (parseInt(this.x2) < parseInt(this.xMax)) {
+      this.warningMessage = false;
+    }
+    if (parseInt(this.x2) < 0) {
+      this.controllers = false;
+      this.warning = true;
+      this.x2 = parseInt(this.x2) + 1;
+    }
+  },
+  // ensure that the y-axis of the grid are not compromised
+  y2() {
+    if (parseInt(this.y2) > parseInt(this.yMax)) {
+      if (this.setup == true) {
+        this.setupWarning = "Must be smaller than the grid size";
+        this.warningMessage = true;
+      } else {
+        this.controllers = false;
+        this.warning = true;
+        this.y2 = parseInt(this.y2) - 1;
+      }
+    }
+    if (parseInt(this.y2) < parseInt(this.yMax)) {
+      this.warningMessage = false;
+    }
+    if (parseInt(this.y2) < 0) {
+      this.controllers = false;
+      this.warning = true;
+      this.y2 = parseInt(this.y2) + 1;
+    }
+  },
   computed: {
     // keep track of the direction
     trueDirection() {
@@ -229,11 +389,29 @@ export default {
         return "North";
       }
     },
+
+    trueDirection2() {
+      if (this.index2 == 0) {
+        return "East";
+      } else if (this.index2 == 1) {
+        return "South";
+      } else if (this.index2 == 2) {
+        return "West";
+      } else {
+        return "North";
+      }
+    },
     height() {
       return this.mt + "%";
     },
     width() {
       return this.ml + "%";
+    },
+    height2() {
+      return this.mt2 + "%";
+    },
+    width2() {
+      return this.ml2 + "%";
     },
     // direction and direction2 form a string used for css class to rotate the rover
     direction() {
@@ -249,8 +427,24 @@ export default {
         return "";
       }
     },
+    directionRover() {
+      if (this.left == true) {
+        return "rotate-left";
+      } else if (this.right == true) {
+        return "rotate-right";
+      } else if (this.up == true) {
+        return "rotate-up";
+      } else if (this.down == true) {
+        return "rotate-down";
+      } else {
+        return "";
+      }
+    },
     direction2() {
       return "rotate(" + this.degrees[this.index] + "deg)";
+    },
+    directionRover2() {
+      return "rotate(" + this.degrees[this.index2] + "deg)";
     }
   }
 };
@@ -326,12 +520,9 @@ del {
 }
 
 h1 {
-  text-align: center;
+  margin-left: 2%;
   font-size: 2.8em;
   font-weight: 800;
-  white-space: pre;
-  line-height: 0.85;
-  color: #999;
 }
 
 hr {
@@ -551,7 +742,7 @@ button .arrow-down {
   margin-left: 37%;
   margin-top: 15%;
   width: 300px;
-  height: 450px;
+  height: 550px;
   background: #f1f1f1;
   border-radius: 12px;
   padding: 35px;
