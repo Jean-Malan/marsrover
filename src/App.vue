@@ -106,6 +106,8 @@ export default {
       this.setup = true;
       this.gridSize = false;
       this.controllers = false;
+      this.x = 0;
+      this.y = 0;
     },
     // splice direction input and call relelvant functions
     directRover() {
@@ -546,7 +548,7 @@ button .arrow-down {
 }
 
 .card {
-  margin-left: 35%;
+  margin-left: 37%;
   margin-top: 15%;
   width: 300px;
   height: 450px;
