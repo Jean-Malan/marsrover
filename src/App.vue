@@ -72,11 +72,8 @@
             Rover 2: X:{{x2}} : {{y2}} {{trueDirection2}}
           </h1>
 
-          <div v-if="controllers == true" style="padding-left:5%" class='controllers'>
-            <!-- <input v-model="roverDirections" placeholder="Enter Rover 1 Directions" style="width:500px;height:50px;position: relative;" />
-            <input v-model="roverDirections2" placeholder="Enter Rover 2 Directions" style="width:500px;height:50px;position: relative;" /> -->
-            <!-- <button @click="directRover" style="width:15%;margin-left:2%;position: relative;" class="btn button-X">Submit</button> -->
-            <button @click="newRover" style="width:15%;margin-left:2%;position: relative;" class="btn button-B">Edit Rovers</button>
+          <div v-if="controllers == true" style="padding-left:2%" class='controllers'>
+            <button @click="newRover" style="width:25%;margin-left:2%;position: relative;" class="btn button-B">Edit Rovers</button>
           </div>
 
           <i v-if="controllers" :style="{'margin-top': height,
@@ -140,7 +137,11 @@ export default {
       left: false,
       up: false,
       down: false,
-      key: ""
+      key: "",
+      roverY2content: false,
+      roverY2size: false,
+      roverXcontent: false,
+      roverXsize: false
     };
   },
 
@@ -234,16 +235,16 @@ export default {
     // depending on the index / degree the rover will move and change its grid position
     moveRover() {
       if (this.index == 0) {
-        this.ml = parseInt(this.ml) + 7;
+        this.ml = parseInt(this.ml) + 3;
         this.x = parseInt(this.x) + 1;
       } else if (this.index == 1) {
-        this.mt = parseInt(this.mt) + 7;
+        this.mt = parseInt(this.mt) + 3;
         this.y = parseInt(this.y) - 1;
       } else if (this.index == 2) {
-        this.ml = parseInt(this.ml) - 7;
+        this.ml = parseInt(this.ml) - 3;
         this.x = parseInt(this.x) - 1;
       } else if (this.index == 3) {
-        this.mt = parseInt(this.mt) - 7;
+        this.mt = parseInt(this.mt) - 3;
         this.y = parseInt(this.y) + 1;
       }
     },
@@ -263,16 +264,16 @@ export default {
     },
     moveRover2() {
       if (this.index2 == 0) {
-        this.ml2 = parseInt(this.ml2) + 7;
+        this.ml2 = parseInt(this.ml2) + 3;
         this.x2 = parseInt(this.x2) + 1;
       } else if (this.index2 == 1) {
-        this.mt2 = parseInt(this.mt2) + 7;
+        this.mt2 = parseInt(this.mt2) + 3;
         this.y2 = parseInt(this.y2) - 1;
       } else if (this.index2 == 2) {
-        this.ml2 = parseInt(this.ml2) - 7;
+        this.ml2 = parseInt(this.ml2) - 3;
         this.x2 = parseInt(this.x2) - 1;
       } else if (this.index2 == 3) {
-        this.mt2 = parseInt(this.mt2) - 7;
+        this.mt2 = parseInt(this.mt2) - 3;
         this.y2 = parseInt(this.y2) + 1;
       }
     },
@@ -304,6 +305,14 @@ export default {
           this.x = parseInt(this.x) - 1;
         }
       }
+      if (/[0-9]/.test(parseInt(this.x)) != true) {
+        this.setupWarning = "Must be an integer";
+        this.warningMessage = true;
+        this.roverXcontent = false;
+      } else {
+        this.setupWarning = "";
+        this.warningMessage = false;
+      }
       if (parseInt(this.x) < parseInt(this.xMax)) {
         this.warningMessage = false;
       }
@@ -325,55 +334,73 @@ export default {
           this.y = parseInt(this.y) - 1;
         }
       }
+      if (/[0-9]/.test(parseInt(this.y)) != true) {
+        this.setupWarning = "Must be an integer";
+        this.warningMessage = true;
+        this.roverYcontent = false;
+      } else {
+        this.setupWarning = "";
+        this.warningMessage = false;
+      }
       if (parseInt(this.y) < parseInt(this.yMax)) {
         this.warningMessage = false;
+        this.roverYcontent = true;
       }
       if (parseInt(this.y) < 0) {
         this.controllers = false;
         this.warning = true;
         this.y = parseInt(this.y) + 1;
       }
-    }
-  },
-  x2() {
-    if (parseInt(this.x2) > parseInt(this.xMax)) {
-      if (this.setup == true) {
-        this.setupWarning = "Must be smaller than the grid size";
+    },
+    // ensure that the y-axis of the grid are not compromised
+    x2() {
+      if (parseInt(this.x2) > parseInt(this.xMax)) {
+        if (this.setup == true) {
+          this.setupWarning = "Must be smaller than the grid size";
+          this.warningMessage = true;
+        } else {
+          this.controllers = false;
+          this.warning = true;
+          this.x2 = parseInt(this.x2) - 1;
+        }
+      }
+      if (parseInt(this.x2) < parseInt(this.xMax)) {
+        this.warningMessage = false;
+      }
+      if (/[0-9]/.test(parseInt(this.x2)) != true) {
+        this.setupWarning = "Must be an integer";
         this.warningMessage = true;
-      } else {
+      }
+      if (parseInt(this.x2) < 0) {
         this.controllers = false;
         this.warning = true;
-        this.x2 = parseInt(this.x2) - 1;
+        this.x2 = parseInt(this.x2) + 1;
       }
-    }
-    if (parseInt(this.x2) < parseInt(this.xMax)) {
-      this.warningMessage = false;
-    }
-    if (parseInt(this.x2) < 0) {
-      this.controllers = false;
-      this.warning = true;
-      this.x2 = parseInt(this.x2) + 1;
-    }
-  },
-  // ensure that the y-axis of the grid are not compromised
-  y2() {
-    if (parseInt(this.y2) > parseInt(this.yMax)) {
-      if (this.setup == true) {
-        this.setupWarning = "Must be smaller than the grid size";
+    },
+    // ensure that the y-axis of the grid are not compromised
+    y2() {
+      if (parseInt(this.y2) > parseInt(this.yMax)) {
+        if (this.setup == true) {
+          this.setupWarning = "Must be smaller than the grid size";
+          this.warningMessage = true;
+        } else {
+          this.controllers = false;
+          this.warning = true;
+          this.y2 = parseInt(this.y2) - 1;
+        }
+      }
+      if (parseInt(this.y2) < parseInt(this.yMax)) {
+        this.warningMessage = false;
+      }
+      if (/[0-9]/.test(parseInt(this.y2)) != true) {
+        this.setupWarning = "Must be an integer";
         this.warningMessage = true;
-      } else {
+      }
+      if (parseInt(this.y2) < 0) {
         this.controllers = false;
         this.warning = true;
-        this.y2 = parseInt(this.y2) - 1;
+        this.y2 = parseInt(this.y2) + 1;
       }
-    }
-    if (parseInt(this.y2) < parseInt(this.yMax)) {
-      this.warningMessage = false;
-    }
-    if (parseInt(this.y2) < 0) {
-      this.controllers = false;
-      this.warning = true;
-      this.y2 = parseInt(this.y2) + 1;
     }
   },
   computed: {
@@ -740,7 +767,7 @@ button .arrow-down {
 
 .card {
   margin-left: 37%;
-  margin-top: 15%;
+  margin-top: 5%;
   width: 300px;
   height: 550px;
   background: #f1f1f1;
